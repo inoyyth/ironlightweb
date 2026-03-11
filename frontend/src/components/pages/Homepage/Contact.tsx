@@ -3,9 +3,9 @@ import Image from "next/image";
 
 export default function Contact() {
   return (
-    <div className="inline-flex w-full flex-col items-start justify-start gap-20 self-stretch bg-neutral-25 p-20">
+    <div className="inline-flex w-full flex-col items-start justify-start gap-20 self-stretch bg-neutral-25 p-0 lg:p-20">
       <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between self-stretch">
+        <div className="flex flex-col gap-6 w-full lg:flex-row items-end justify-between self-stretch">
           <div className="inline-flex flex-col items-start justify-start gap-4">
             <Image
               alt="ironlight"
@@ -24,7 +24,7 @@ export default function Contact() {
             </div>
           </div>
           <div className="inline-flex flex-col items-start justify-start gap-6">
-            <div className="w-[519px] justify-start text-base font-normal leading-6 text-neutral-900">
+            <div className="w-full lg:w-[519px] justify-start text-base font-normal leading-6 text-neutral-900">
               A senior-led team. Clearly scoped engagements. Practical decisions
               over meetings. We build systems that stay built.
             </div>

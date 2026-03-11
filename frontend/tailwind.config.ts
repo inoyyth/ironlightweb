@@ -19,6 +19,10 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        manrope: ["var(--font-manrope)", "sans-serif"],
+        inter: ["var(--font-inter)", "sans-serif"],
+      },
       keyframes: {
         up: { to: { opacity: "1", transform: "none" } },
         fadeIn: { to: { opacity: "1" } },

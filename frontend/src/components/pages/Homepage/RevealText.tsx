@@ -37,8 +37,8 @@ export default function HomepageScrollRevealText() {
       <div className="relative z-10 pb-0 pt-20 lg:pb-20">
         <ScrollRevealText
           content={SEGMENTS}
-          pointStartChange={isMobile ? 800 : 150}
-          endPointChange={isMobile ? 800 : 250}
+          pointStartChange={isMobile ? 250 : 150}
+          endPointChange={isMobile ? 250 : 250}
           className="text-center text-2xl lg:text-5xl font-bold leading-9 lg:first-letter:leading-[64px]"
         />
       </div>

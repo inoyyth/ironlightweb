@@ -8,7 +8,7 @@ export default function Banner() {
         <div className="pointer-events-none absolute inset-0 z-[1] bg-transparent" />
 
         {/* Hero content */}
-        <div className="relative top-[54px] z-[2]  px-0 lg:px-[52px]">
+        <div className="relative top-[54px] z-[2] max-w-[680px] px-0 lg:px-[52px]">
           <h1 className="animate-up mb-[26px] text-[clamp(40px,5.2vw,32px)] lg:text-[clamp(40px,5.2vw,54px)] font-extrabold leading-[1.06] tracking-[-0.025em] text-neutral-25 opacity-0 [transform:translateY(22px)]">
             We fix the systems your business runs on.
           </h1>

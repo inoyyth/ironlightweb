@@ -6,7 +6,7 @@ interface MainContentProps {
 
 export default function MainContent({ children }: MainContentProps) {
   return (
-    <main className="flex-1 overflow-y-auto">
+    <main className="flex-1">
       {children}
       <Footer />
     </main>

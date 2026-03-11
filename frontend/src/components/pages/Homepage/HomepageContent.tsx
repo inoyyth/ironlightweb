@@ -1,19 +1,19 @@
-import CustomerSlider from "./CustomerSlider";
-import Experience from "./Experience";
+import Contact from "@/components/pages/Homepage/Contact";
+import Conversation from "@/components/pages/Homepage/Conversation";
+import Experience from "@/components/pages/Homepage/Experience";
+import ParallaxWhoSection from "@/components/pages/Homepage/ParallaxWhoSection";
+import CustomerSlider from "@/components/pages/Homepage/CustomerSlider";
+import HomepageScrollRevealText from "@/components/pages/Homepage/RevealText";
 
 export default function HomepageContent() {
   return (
-    <div className="w-full bg-neutral-900 pt-10">
-      <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="text-neutral-25 text-center text-5xl font-bold">
-          We design and build systems that didn't exist. <br />
-          We rebuild systems that matter. <br />
-          We integrate things that were never meant to fit. We take over live
-          systems and make them stable
-        </div>
-      </div>
+    <div className="w-full bg-neutral-900">
+      <HomepageScrollRevealText />
       <CustomerSlider />
       <Experience />
+      <ParallaxWhoSection />
+      <Conversation />
+      <Contact />
     </div>
   );
 }

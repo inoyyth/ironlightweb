@@ -1,46 +1,42 @@
-import GlobeCanvas from "./GlobeCanvas";
+import Svg from "@/components/shared/Svg";
 
 export default function Banner() {
   return (
-    // <section className="w-full bg-neutral-950">tes</section>
-    <section className="relative top-0 h-[calc(100vh-64px)] w-full bg-neutral-900">
+    <section className="relative top-0 h-[calc(100vh-64px)] w-full">
       <div className="container mx-auto max-w-7xl">
-        <GlobeCanvas />
-
         {/* Vignette overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 z-[1]"
-          style={{
-            background:
-              "linear-gradient(to right, #080808 28%, transparent 62%, #080808 100%), linear-gradient(to bottom, #080808 0%, transparent 12%, transparent 88%, #080808 100%)",
-          }}
-        />
+        <div className="pointer-events-none absolute inset-0 z-[1] bg-transparent" />
 
         {/* Hero content */}
-        <div className="relative top-[54px] z-[2] max-w-[680px] px-[52px]">
-          <h1 className="text-neutral-25 mb-[26px] text-[clamp(40px,5.2vw,54px)] font-extrabold leading-[1.06] tracking-[-0.025em] opacity-0 [animation:up_0.75s_ease_0.55s_forwards] [transform:translateY(22px)]">
+        <div className="relative top-[54px] z-[2]  px-0 lg:px-[52px]">
+          <h1 className="animate-up mb-[26px] text-[clamp(40px,5.2vw,32px)] lg:text-[clamp(40px,5.2vw,54px)] font-extrabold leading-[1.06] tracking-[-0.025em] text-neutral-25 opacity-0 [transform:translateY(22px)]">
             We fix the systems your business runs on.
           </h1>
         </div>
         {/* Scroll hint */}
-        <div className="text-neutral-25 absolute bottom-[54px] z-[2] max-w-[630px] px-[52px] pt-6 text-lg opacity-0 [animation:fadeIn_0.75s_ease_1.5s_forwards]">
+        <div className="animate-fade-in absolute left-0 bottom-[54px] z-[2] max-w-full lg:max-w-[630px] px-4 lg:px-[52px] pt-6 text-base lg:text-lg text-neutral-25 opacity-0">
           Web systems, commerce platforms, and enterprise integrations — built
           right and kept stable.
+          <div className="flex flex-col lg:flex-row gap-4 pt-6">
+            <div className="group flex h-11 cursor-pointer items-center justify-center gap-2 rounded bg-neutral-25 px-4 outline outline-1 outline-offset-[-1px] outline-neutral-25">
+              <div className="cursor-pointer justify-start text-sm font-semibold leading-5 text-neutral-900">
+                Let’s Work Together
+              </div>
+              <div className="hidden group-hover:block relative h-6 w-6 overflow-hidden">
+                <Svg
+                  use="arrow"
+                  className="h-6 w-6 text-neutral-900 "
+                />
+              </div>
+            </div>
+            <div className="group flex h-11 cursor-pointer items-center justify-center gap-2 rounded bg-neutral-960 px-4 outline outline-1 outline-offset-[-1px] outline-neutral-960">
+              <div className="cursor-pointer justify-start text-sm font-semibold leading-5 text-neutral-25">
+                View Our Works
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes up { to { opacity: 1; transform: none; } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes scan { 0%{left:-100%} 50%{left:100%} 100%{left:100%} }
-        .scroll-line::after {
-          content: '';
-          position: absolute;
-          top: 0; left: -100%; width: 100%; height: 100%;
-          background: #F5A623;
-          animation: scan 2s ease-in-out 1.6s infinite;
-        }
-      `}</style>
     </section>
   );
 }

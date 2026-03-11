@@ -3,7 +3,26 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-export default function GlobeCanvas() {
+type GlobeCanvasProps = {
+  // add options like point count, colors, etc.
+  position?: number;
+  cameraStartSize?: number;
+  cameraEndSize?: number;
+  disableAutoRotate?: boolean;
+  disableMouseControl?: boolean;
+  disableScrollEffect?: boolean;
+  disableResize?: boolean;
+};
+
+export default function GlobeCanvas({
+  position = 15,
+  cameraStartSize = 3.8,
+  cameraEndSize = 7,
+  disableAutoRotate = false,
+  disableMouseControl = false,
+  disableScrollEffect = false,
+  disableResize = false,
+}: GlobeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -25,7 +44,9 @@ export default function GlobeCanvas() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
-    camera.position.set(0, 0, 3.8);
+    const CAMERA_Z_START = cameraStartSize;
+    const CAMERA_Z_END = cameraEndSize;
+    camera.position.set(0, 0, CAMERA_Z_START);
 
     // ── GLOBE POINTS ──
     const RADIUS = 1.15;
@@ -169,13 +190,26 @@ export default function GlobeCanvas() {
     let autoRotY = 0;
 
     const onMouseMove = (e: MouseEvent) => {
+      if (disableMouseControl) return;
       targetRotX = (e.clientY / window.innerHeight - 0.5) * 0.5;
       targetRotY = (e.clientX / window.innerWidth - 0.5) * 0.8;
     };
     document.addEventListener("mousemove", onMouseMove);
 
+    // ── SCROLL → slide globe from left to center + zoom in ──
+    const bannerHeight = window.innerHeight - 64;
+    let scrollProgress = 0;
+    const onScroll = () => {
+      if (disableScrollEffect) return;
+      scrollProgress = Math.min(1, window.scrollY / bannerHeight);
+      canvas.style.transform = `translateX(${(1 - scrollProgress) * position}%)`;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // set initial position
+
     // ── RESIZE via ResizeObserver ──
     const ro = new ResizeObserver(() => {
+      if (disableResize) return;
       W = canvas.clientWidth;
       H = canvas.clientHeight;
       renderer.setSize(W, H, false);
@@ -190,7 +224,7 @@ export default function GlobeCanvas() {
     function animate(_t: number) {
       rafId = requestAnimationFrame(animate);
 
-      autoRotY += 0.0028;
+      autoRotY += disableAutoRotate ? 0 : 0.0028;
       currentRotX += (targetRotX - currentRotX) * 0.04;
       currentRotY += (targetRotY - currentRotY) * 0.04;
 
@@ -202,6 +236,13 @@ export default function GlobeCanvas() {
       ring1.rotation.y = autoRotY * 0.4;
       ring2.rotation.y = autoRotY * 0.25 + currentRotY;
 
+      // Zoom in as globe moves to center
+      camera.position.z +=
+        (CAMERA_Z_START +
+          (CAMERA_Z_END - CAMERA_Z_START) * scrollProgress -
+          camera.position.z) *
+        0.05;
+
       renderer.render(scene, camera);
     }
 
@@ -210,15 +251,24 @@ export default function GlobeCanvas() {
     return () => {
       cancelAnimationFrame(rafId);
       document.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("scroll", onScroll);
       ro.disconnect();
       renderer.dispose();
     };
-  }, []);
+  }, [
+    position,
+    cameraStartSize,
+    cameraEndSize,
+    disableAutoRotate,
+    disableMouseControl,
+    disableScrollEffect,
+    disableResize,
+  ]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute right-0 top-0 h-full w-[65%]"
+      className="pointer-events-none absolute inset-0 h-full w-full"
     />
   );
 }

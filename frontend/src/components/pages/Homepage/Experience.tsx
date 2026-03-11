@@ -1,4 +1,5 @@
-import ParallaxWhoSection from "./ParallaxWhoSection";
+import ScrollRevealText from "@/components/shared/ScrollRevealText";
+import GlobeCanvas from "@/components/shared/GlobeCanvas";
 
 export default function Experience() {
   const experiences = [
@@ -7,11 +8,15 @@ export default function Experience() {
     "Every project ship-ready",
   ];
 
+  const SEGMENTS = [
+    " Clear scope. Calm communication. Decisions made once, not daily. You get a senior engineer who asks the right questions before writing a single line of code.",
+  ];
+
   return (
     <>
-      <div className="w-full bg-neutral-900 pt-16">
-        <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <div className="bg-secondary-600 mb-8 flex items-center justify-center gap-0">
+      <div className="w-full bg-transparent">
+        <div className="container relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="relative z-10 mb-8 flex items-center justify-center gap-0 bg-secondary-600">
             {experiences.map((exp, i) => (
               <p
                 key={i}
@@ -21,22 +26,27 @@ export default function Experience() {
               </p>
             ))}
           </div>
-          <div className="pt-20">
-            <h2 className="text-secondary-600 text-2xl font-semibold leading-10">
+          <div className="relative z-10 py-20">
+            <h2 className="text-2xl font-semibold leading-10 text-secondary-600">
               How it feels to work with us
             </h2>
-            <p className="leading-14 text-4xl font-bold text-neutral-400">
-              Clear scope. Calm communication. Decisions made once, not daily. You
-              get a senior engineer who asks the right questions before writing a
-              single line of code.
-            </p>
-            <div className="bg-secondary-600 mt-16 w-fit p-4 text-4xl font-bold">
+            <ScrollRevealText
+              content={SEGMENTS}
+              pointStartChange={150}
+              endPointChange={250}
+              className="text-left text-5xl font-bold leading-[64px]"
+            />
+            <div className="mt-16 w-fit cursor-pointer bg-secondary-600 p-4 text-4xl font-bold opacity-50 transition-opacity hover:opacity-100">
               No chaos. No theatre.
+            </div>
+          </div>
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <div className="absolute inset-0 translate-x-[26%] translate-y-[36%] p-4">
+              <GlobeCanvas cameraStartSize={3} cameraEndSize={3} position={0} />
             </div>
           </div>
         </div>
       </div>
-      <ParallaxWhoSection />
     </>
   );
 }

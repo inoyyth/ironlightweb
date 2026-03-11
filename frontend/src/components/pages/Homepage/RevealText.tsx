@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import ScrollRevealText from "@/components/shared/ScrollRevealText";
 import GlobeCanvas from "@/components/shared/GlobeCanvas";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const SEGMENTS = [
   "We design and build systems that didn't exist. ",
@@ -13,6 +14,9 @@ const SEGMENTS = [
 export default function HomepageScrollRevealText() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const isMobile = useIsMobile();
+
+  console.log(isMobile)
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -30,12 +34,12 @@ export default function HomepageScrollRevealText() {
       ref={sectionRef}
       className="container relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"
     >
-      <div className="relative z-10 py-20">
+      <div className="relative z-10 pb-0 pt-20 lg:pb-20">
         <ScrollRevealText
           content={SEGMENTS}
-          pointStartChange={150}
-          endPointChange={250}
-          className="text-center text-2xl lg:text-5xl font-bold leading-7 lg:leading-[64px]"
+          pointStartChange={isMobile ? 800 : 150}
+          endPointChange={isMobile ? 800 : 250}
+          className="text-center text-2xl lg:text-5xl font-bold leading-9 lg:first-letter:leading-[64px]"
         />
       </div>
       {visible && (

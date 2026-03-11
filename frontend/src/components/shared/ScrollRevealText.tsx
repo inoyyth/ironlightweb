@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useEffect, useRef } from "react";
 
 interface ScrollRevealTextProps {
@@ -22,6 +23,7 @@ export default function ScrollRevealText({
   className,
 }: ScrollRevealTextProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const tokens: Token[] = [];
   content.forEach((seg, i) => {
@@ -36,12 +38,13 @@ export default function ScrollRevealText({
     const spans = Array.from(el.querySelectorAll<HTMLSpanElement>("span"));
 
     // Animation completes when element top reaches endPointChange px from viewport top
+    const speedMultiplier = isMobile ? 2 : 1;
     const pxPerLetter =
       (window.innerHeight - pointStartChange - endPointChange) / spans.length;
 
     const onScroll = () => {
       const scrolledPast =
-        window.innerHeight - el.getBoundingClientRect().top - pointStartChange;
+        (window.innerHeight - el.getBoundingClientRect().top - pointStartChange) * speedMultiplier;
       const litCount = Math.max(
         0,
         Math.min(spans.length, Math.floor(scrolledPast / pxPerLetter))
@@ -54,7 +57,7 @@ export default function ScrollRevealText({
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, [colorStart, colorChange, pointStartChange, endPointChange]);
+  }, [colorStart, colorChange, pointStartChange, endPointChange, isMobile]);
 
   return (
     <div ref={ref} className={className}>

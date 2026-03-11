@@ -216,7 +216,7 @@ export default function CustomerSlider() {
   };
 
   return (
-    <div className="w-full overflow-hidden bg-transparent py-[128px]">
+    <div className="w-full overflow-hidden bg-transparent py-20 lg:py-[128px]">
       <div ref={containerRef} className="animate-marquee flex w-max">
         {items.map((name, i) => (
           <SliderItem

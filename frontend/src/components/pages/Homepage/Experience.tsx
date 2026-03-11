@@ -15,18 +15,18 @@ export default function Experience() {
   return (
     <>
       <div className="w-full bg-transparent">
-        <div className="container relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <div className="relative z-10 mb-8 flex items-center justify-center gap-0 bg-secondary-600">
+        <div className="container relative mx-auto max-w-7xl px-0 py-6 sm:px-6 lg:px-8">
+          <div className="relative z-10 mb-8 flex flex-col lg:flex-row items-center justify-center gap-0 bg-secondary-600">
             {experiences.map((exp, i) => (
               <p
                 key={i}
-                className="flex-1 border-r border-neutral-900 px-14 py-10 text-center text-3xl font-bold text-neutral-900 last:border-0"
+                className="flex-1 border-b border-r-0 lg:border-r lg:border-b-0 border-neutral-900 px-14 py-10 text-center text-3xl font-bold text-neutral-900 last:border-0"
               >
                 {exp}
               </p>
             ))}
           </div>
-          <div className="relative z-10 py-20">
+          <div className="relative z-10 py-20 px-4 lg:px-0">
             <h2 className="text-2xl font-semibold leading-10 text-secondary-600">
               How it feels to work with us
             </h2>
@@ -34,13 +34,13 @@ export default function Experience() {
               content={SEGMENTS}
               pointStartChange={150}
               endPointChange={250}
-              className="text-left text-5xl font-bold leading-[64px]"
+              className="text-left text-2xl lg:text-5xl font-bold leading-8 lg:leading-[64px]"
             />
-            <div className="mt-16 w-fit cursor-pointer bg-secondary-600 p-4 text-4xl font-bold opacity-50 transition-opacity hover:opacity-100">
+            <div className="mt-16 w-fit cursor-pointer bg-secondary-600 p-4 text-2xl lg:text-4xl font-bold opacity-50 transition-opacity hover:opacity-100">
               No chaos. No theatre.
             </div>
           </div>
-          <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="hidden lg:absolute inset-0 z-0 overflow-hidden">
             <div className="absolute inset-0 translate-x-[26%] translate-y-[36%] p-4">
               <GlobeCanvas cameraStartSize={3} cameraEndSize={3} position={0} />
             </div>

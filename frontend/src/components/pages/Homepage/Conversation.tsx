@@ -12,18 +12,19 @@ export default function Conversation() {
               position={0}
               disableScrollEffect
               disableMouseControl
+              disableLightning
             />
           </div>
         </div>
       <div className="container relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="relative z-flex flex-col items-center justify-start gap-2 self-stretch">
+        <div className="relative flex flex-col items-center justify-start gap-2 self-stretch">
           <div className="justify-start self-stretch text-center text-2xl lg:text-3xl font-bold leading-10 text-neutral-25">
             Start a conversation
           </div>
           <div className="justify-start self-stretch text-center text-base font-normal leading-6 text-neutral-25">
             No forms. No sales calls. Just a direct message to Henri.
           </div>
-          <div className="flex flex-col lg:flex-row w-full items-center justify-center gap-10">
+          <div className="flex mt-6 flex-col lg:flex-row w-full items-center justify-center gap-10">
             <div className="group flex cursor-pointer items-center justify-center gap-2.5 border-b px-6 py-5 hover:border-b-2 hover:border-secondary-500">
               <div className="flex items-center justify-start gap-3 text-center text-[20px] lg:text-3xl font-bold leading-10 text-neutral-25">
                 <span>hello@ironlight.ee</span>

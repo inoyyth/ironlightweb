@@ -1,6 +1,5 @@
 import Svg from "@/components/shared/Svg";
 import Image from "next/image";
-import GlobeCanvas from "@/components/shared/GlobeCanvas";
 
 export default function Contact() {
   return (

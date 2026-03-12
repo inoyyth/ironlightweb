@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import ScrollRevealText from "@/components/shared/ScrollRevealText";
 import GlobeCanvas from "@/components/shared/GlobeCanvas";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -13,21 +13,7 @@ const SEGMENTS = [
 
 export default function HomepageScrollRevealText() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
   const isMobile = useIsMobile();
-
-  console.log(isMobile)
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setVisible(entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div
@@ -45,7 +31,7 @@ export default function HomepageScrollRevealText() {
 
         <div className="hidden lg:block absolute inset-0 z-0 top-10 overflow-hidden">
           <div className="absolute inset-0 p-4">
-            <GlobeCanvas cameraStartSize={2000} cameraEndSize={3} position={0} />
+            <GlobeCanvas disableLightning cameraStartSize={2000} cameraEndSize={3} position={0} />
           </div>
         </div>
       

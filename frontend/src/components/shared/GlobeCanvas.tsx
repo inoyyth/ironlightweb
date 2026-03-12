@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -16,6 +17,7 @@ type GlobeCanvasProps = {
   disableMouseControl?: boolean;
   disableScrollEffect?: boolean;
   disableResize?: boolean;
+  disableLightning?: boolean;
 };
 
 export default function GlobeCanvas({
@@ -28,6 +30,7 @@ export default function GlobeCanvas({
   disableMouseControl = false,
   disableScrollEffect = false,
   disableResize = false,
+  disableLightning = false,
 }: GlobeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -131,7 +134,8 @@ export default function GlobeCanvas({
 
     const lineSegGeo = new LineSegmentsGeometry();
     lineSegGeo.setPositions(linePosArr); // stores reference to linePosArr
-    const lineInstBuf = lineSegGeo.getAttribute("instanceStart").data; // InstancedInterleavedBuffer
+    //@ts-expect-error
+    const lineInstBuf = lineSegGeo.getAttribute("instanceStart")?.data; // InstancedInterleavedBuffer
 
     const lineMat = new LineMaterial({
       color: 0x909098,
@@ -385,17 +389,19 @@ export default function GlobeCanvas({
       wasDisplaced = anyDisp;
 
       // ── LIGHTNING ──
-      if (hits) {
-        if (lightningTick % 3 === 0) spawnLightning(hitPt.x, hitPt.y, hitPt.z);
-        lightningTick++;
-        lightningOpacity = Math.min(1, lightningOpacity + 0.22);
-      } else {
-        lightningTick = 0;
-        lightningOpacity = Math.max(0, lightningOpacity - 0.10);
+      if (!disableLightning) {
+        if (hits) {
+          if (lightningTick % 3 === 0) spawnLightning(hitPt.x, hitPt.y, hitPt.z);
+          lightningTick++;
+          lightningOpacity = Math.min(1, lightningOpacity + 0.22);
+        } else {
+          lightningTick = 0;
+          lightningOpacity = Math.max(0, lightningOpacity - 0.10);
+        }
+        const flicker = hits ? 0.65 + Math.random() * 0.35 : 1.0;
+        lightningCoreMat.opacity = lightningOpacity * flicker * 0.95;
+        lightningGlowMat.opacity = lightningOpacity * flicker * 0.50;
       }
-      const flicker = hits ? 0.65 + Math.random() * 0.35 : 1.0;
-      lightningCoreMat.opacity = lightningOpacity * flicker * 0.95;
-      lightningGlowMat.opacity = lightningOpacity * flicker * 0.50;
       renderer.render(scene, camera);
     }
 
@@ -418,6 +424,7 @@ export default function GlobeCanvas({
     disableMouseControl,
     disableScrollEffect,
     disableResize,
+    disableLightning,
   ]);
 
   return (

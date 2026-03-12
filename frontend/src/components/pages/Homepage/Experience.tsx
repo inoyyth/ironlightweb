@@ -1,7 +1,9 @@
 import ScrollRevealText from "@/components/shared/ScrollRevealText";
 import GlobeCanvas from "@/components/shared/GlobeCanvas";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function Experience() {
+  const isMobile = useIsMobile()
   const experiences = [
     "12+ Years combined senior experience",
     "Estonian, Nordic & global clients",
@@ -27,22 +29,22 @@ export default function Experience() {
             ))}
           </div>
           <div className="relative z-10 py-20 px-4 lg:px-0">
-            <h2 className="text-2xl font-semibold leading-10 text-secondary-600">
+            <h2 className="text-base mb-4 lg:mb-8 lg:text-2xl font-semibold leading-10 text-secondary-600">
               How it feels to work with us
             </h2>
             <ScrollRevealText
               content={SEGMENTS}
-              pointStartChange={150}
-              endPointChange={250}
+              pointStartChange={isMobile ? 300 : 150}
+              endPointChange={isMobile ? 350 :250}
               className="text-left text-2xl lg:text-5xl font-bold leading-8 lg:leading-[64px]"
             />
-            <div className="mt-16 w-fit cursor-pointer bg-secondary-600 p-4 text-2xl lg:text-4xl font-bold opacity-50 transition-opacity hover:opacity-100">
+            <div className="text-neutral-25 lg:text-neutral-900 mt-16 w-fit cursor-pointer bg-neutral-960 lg:bg-secondary-600 p-4 text-2xl lg:text-4xl font-bold opacity-100 lg:opacity-50 lg:transition-opacity lg:hover:opacity-100">
               No chaos. No theatre.
             </div>
           </div>
           <div className="hidden lg:block lg:absolute inset-0 z-0 overflow-hidden">
             <div className="absolute inset-0 translate-x-[26%] translate-y-[36%] p-4">
-              <GlobeCanvas cameraStartSize={3} cameraEndSize={3} position={0} />
+              <GlobeCanvas disableLightning cameraStartSize={3} cameraEndSize={3} position={0} />
             </div>
           </div>
         </div>

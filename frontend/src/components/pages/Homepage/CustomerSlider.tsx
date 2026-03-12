@@ -188,7 +188,7 @@ function SliderItem({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <span className="px-10 text-sm font-semibold tracking-wide text-neutral-500 transition-colors duration-200 hover:text-neutral-25">
+      <span className="px-6 lg:px-10 text-sm font-semibold tracking-wide text-neutral-500 transition-colors duration-200 hover:text-neutral-25">
         {name.icon}
       </span>
     </div>

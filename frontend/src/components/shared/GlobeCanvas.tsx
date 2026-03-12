@@ -2,10 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
+import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
+import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 type GlobeCanvasProps = {
-  // add options like point count, colors, etc.
   position?: number;
+  xOffset?: number;
+  yOffset?: number;
   cameraStartSize?: number;
   cameraEndSize?: number;
   disableAutoRotate?: boolean;
@@ -16,6 +20,8 @@ type GlobeCanvasProps = {
 
 export default function GlobeCanvas({
   position = 15,
+  xOffset = 0,
+  yOffset = 0,
   cameraStartSize = 3.8,
   cameraEndSize = 7,
   disableAutoRotate = false,
@@ -29,174 +35,253 @@ export default function GlobeCanvas({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Use canvas own size for correct aspect ratio
     let W = canvas.clientWidth;
     let H = canvas.clientHeight;
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: false,
-    });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(W, H, false);
     renderer.setClearColor(0x080808, 1);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
-    const CAMERA_Z_START = cameraStartSize;
-    const CAMERA_Z_END = cameraEndSize;
-    camera.position.set(0, 0, CAMERA_Z_START);
+    camera.position.set(0, 0, cameraStartSize);
 
-    // ── GLOBE POINTS ──
     const RADIUS = 1.15;
-    const N = 800;
+    const N = 400;              // Sparse enough for large triangular faces
+    const CONN_THRESH = 0.34;   // Angular threshold (radians) for edges
+    const MAGNET_RADIUS = 0.72; // Influence radius in local units
+    const MAGNET_STRENGTH = 0.30; // Pull magnitude as fraction of RADIUS
+    const LIGHTNING_MAX_SEGS = 1600;
 
-    const geo = new THREE.BufferGeometry();
-    const positions = new Float32Array(N * 3);
+    // ── VERTEX DATA ──
+    const basePositions = new Float32Array(N * 3);
+    const currentPositions = new Float32Array(N * 3);
+    const currentDisp = new Float32Array(N * 3);
+    const dispTargets = new Float32Array(N * 3);
     const colors = new Float32Array(N * 3);
 
-    const colBase = new THREE.Color(0.55, 0.52, 0.48);
-    const colAmber = new THREE.Color(0.96, 0.65, 0.14);
+    const colGrey = new THREE.Color(0.50, 0.50, 0.53);
+    const colBlue = new THREE.Color(0.22, 0.52, 1.00);
 
     for (let i = 0; i < N; i++) {
       const phi = Math.acos(1 - (2 * (i + 0.5)) / N);
       const theta = Math.PI * (1 + Math.sqrt(5)) * i;
-      positions[i * 3] = RADIUS * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = RADIUS * Math.cos(phi);
-      positions[i * 3 + 2] = RADIUS * Math.sin(phi) * Math.sin(theta);
-      const c = Math.random() < 0.12 ? colAmber : colBase;
+      const x = RADIUS * Math.sin(phi) * Math.cos(theta);
+      const y = RADIUS * Math.cos(phi);
+      const z = RADIUS * Math.sin(phi) * Math.sin(theta);
+      basePositions[i * 3] = x;
+      basePositions[i * 3 + 1] = y;
+      basePositions[i * 3 + 2] = z;
+      currentPositions[i * 3] = x;
+      currentPositions[i * 3 + 1] = y;
+      currentPositions[i * 3 + 2] = z;
+
+      const c = Math.random() < 0.05 ? colBlue : colGrey;
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
     }
 
-    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    // ── GLOBE GROUP — points + lines rotate together ──
+    const globeGroup = new THREE.Group();
+    scene.add(globeGroup);
+
+    // Points
+    const geo = new THREE.BufferGeometry();
+    const posBuf = new THREE.BufferAttribute(currentPositions, 3).setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute("position", posBuf);
     geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
-    const mat = new THREE.PointsMaterial({
-      size: 0.018,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.85,
-      sizeAttenuation: true,
-    });
-
-    const points = new THREE.Points(geo, mat);
-    scene.add(points);
-
-    // ── CONNECTIONS ──
-    const MAX_CONNECTIONS = 1400;
-    const linePosArr = new Float32Array(MAX_CONNECTIONS * 2 * 3);
-    const lineColArr = new Float32Array(MAX_CONNECTIONS * 2 * 3);
-    const lineGeo = new THREE.BufferGeometry();
-    const linePosBuf = new THREE.BufferAttribute(linePosArr, 3).setUsage(
-      THREE.DynamicDrawUsage
+    globeGroup.add(
+      new THREE.Points(
+        geo,
+        new THREE.PointsMaterial({
+          size: 0.028,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.90,
+          sizeAttenuation: true,
+        })
+      )
     );
-    const lineColBuf = new THREE.BufferAttribute(lineColArr, 3).setUsage(
-      THREE.DynamicDrawUsage
-    );
-    lineGeo.setAttribute("position", linePosBuf);
-    lineGeo.setAttribute("color", lineColBuf);
 
-    const lineMat = new THREE.LineBasicMaterial({
-      vertexColors: true,
+    // ── CONNECTIONS — irregular topology ──
+    // Very close: always connect. Near-threshold: 70% chance. Far: rare random skip.
+    const connPairs: number[] = [];
+    for (let i = 0; i < N; i++) {
+      const ax = basePositions[i * 3], ay = basePositions[i * 3 + 1], az = basePositions[i * 3 + 2];
+      for (let j = i + 1; j < N; j++) {
+        const bx = basePositions[j * 3], by = basePositions[j * 3 + 1], bz = basePositions[j * 3 + 2];
+        const dot = (ax * bx + ay * by + az * bz) / (RADIUS * RADIUS);
+        const ang = Math.acos(Math.max(-1, Math.min(1, dot)));
+        if (ang < CONN_THRESH * 0.55) {
+          connPairs.push(i, j);                           // very close → always
+        } else if (ang < CONN_THRESH) {
+          if (Math.random() < 0.68) connPairs.push(i, j); // medium → 68%
+        } else if (ang < CONN_THRESH * 2.8) {
+          if (Math.random() < 0.007) connPairs.push(i, j); // far → rare skip
+        }
+      }
+    }
+
+    const numConn = connPairs.length / 2;
+    // linePosArr: flat [x0,y0,z0, x1,y1,z1, ...] — one pair per segment
+    const linePosArr = new Float32Array(numConn * 6);
+
+    const lineSegGeo = new LineSegmentsGeometry();
+    lineSegGeo.setPositions(linePosArr); // stores reference to linePosArr
+    const lineInstBuf = lineSegGeo.getAttribute("instanceStart").data; // InstancedInterleavedBuffer
+
+    const lineMat = new LineMaterial({
+      color: 0x909098,
       transparent: true,
-      opacity: 0.45,
+      opacity: 0.38,
+      linewidth: 1.6, // pixels — works on all platforms
+      resolution: new THREE.Vector2(W, H),
     });
-    const lines = new THREE.LineSegments(lineGeo, lineMat);
-    scene.add(lines);
+    globeGroup.add(new LineSegments2(lineSegGeo, lineMat));
 
-    const THRESH = 0.52;
-    const amberLine = new THREE.Color(0.96, 0.65, 0.14);
-    const dimLine = new THREE.Color(0.22, 0.21, 0.19);
+    function updateLines() {
+      for (let k = 0; k < numConn; k++) {
+        const i = connPairs[k * 2], j = connPairs[k * 2 + 1];
+        linePosArr[k * 6]     = currentPositions[i * 3];
+        linePosArr[k * 6 + 1] = currentPositions[i * 3 + 1];
+        linePosArr[k * 6 + 2] = currentPositions[i * 3 + 2];
+        linePosArr[k * 6 + 3] = currentPositions[j * 3];
+        linePosArr[k * 6 + 4] = currentPositions[j * 3 + 1];
+        linePosArr[k * 6 + 5] = currentPositions[j * 3 + 2];
+      }
+      lineInstBuf.needsUpdate = true;
+    }
 
-    function updateConnections() {
-      const pos = geo.attributes.position.array as Float32Array;
-      let ci = 0;
-      for (let i = 0; i < N && ci < MAX_CONNECTIONS; i++) {
-        const ax = pos[i * 3],
-          ay = pos[i * 3 + 1],
-          az = pos[i * 3 + 2];
-        for (let j = i + 1; j < N && ci < MAX_CONNECTIONS; j++) {
-          const bx = pos[j * 3],
-            by = pos[j * 3 + 1],
-            bz = pos[j * 3 + 2];
-          const dot = (ax * bx + ay * by + az * bz) / (RADIUS * RADIUS);
-          const ang = Math.acos(Math.max(-1, Math.min(1, dot)));
-          if (ang < THRESH) {
-            const t = 1 - ang / THRESH;
-            const isAmber = colors[i * 3] > 0.8 || colors[j * 3] > 0.8;
-            const c = isAmber ? amberLine : dimLine;
-            const f = t * (isAmber ? 0.9 : 0.55);
-            linePosArr[ci * 6] = ax;
-            linePosArr[ci * 6 + 1] = ay;
-            linePosArr[ci * 6 + 2] = az;
-            linePosArr[ci * 6 + 3] = bx;
-            linePosArr[ci * 6 + 4] = by;
-            linePosArr[ci * 6 + 5] = bz;
-            lineColArr[ci * 6] = c.r * f;
-            lineColArr[ci * 6 + 1] = c.g * f;
-            lineColArr[ci * 6 + 2] = c.b * f;
-            lineColArr[ci * 6 + 3] = c.r * f;
-            lineColArr[ci * 6 + 4] = c.g * f;
-            lineColArr[ci * 6 + 5] = c.b * f;
-            ci++;
+    updateLines();
+
+    // ── LIGHTNING GEOMETRY ──
+    const lightningPosArr = new Float32Array(LIGHTNING_MAX_SEGS * 6);
+    const lightningGeo = new THREE.BufferGeometry();
+    const lightningPosBuf = new THREE.BufferAttribute(lightningPosArr, 3).setUsage(THREE.DynamicDrawUsage);
+    lightningGeo.setAttribute("position", lightningPosBuf);
+    lightningGeo.setDrawRange(0, 0);
+
+    // Bright white core
+    const lightningCoreMat = new THREE.LineBasicMaterial({ color: 0xddeeff, transparent: true, opacity: 0 });
+    globeGroup.add(new THREE.LineSegments(lightningGeo, lightningCoreMat));
+    // Blue glow layer (same geometry)
+    const lightningGlowMat = new THREE.LineBasicMaterial({ color: 0x3399ff, transparent: true, opacity: 0 });
+    globeGroup.add(new THREE.LineSegments(lightningGeo, lightningGlowMat));
+
+    // Adjacency map for branching along mesh edges
+    const adjacency = new Map<number, number[]>();
+    for (let k = 0; k < connPairs.length; k += 2) {
+      const a = connPairs[k], b = connPairs[k + 1];
+      if (!adjacency.has(a)) adjacency.set(a, []);
+      if (!adjacency.has(b)) adjacency.set(b, []);
+      adjacency.get(a)!.push(b);
+      adjacency.get(b)!.push(a);
+    }
+
+    // Recursive midpoint-displacement to produce jagged bolt segments
+    function genJagged(
+      out: number[],
+      ax: number, ay: number, az: number,
+      bx: number, by: number, bz: number,
+      depth: number,
+      jitter: number
+    ) {
+      if (depth === 0 || out.length >= LIGHTNING_MAX_SEGS * 6 - 6) {
+        out.push(ax, ay, az, bx, by, bz);
+        return;
+      }
+      const mx = (ax + bx) * 0.5, my = (ay + by) * 0.5, mz = (az + bz) * 0.5;
+      const dx = bx - ax, dy = by - ay, dz = bz - az;
+      const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (len < 0.0001) { out.push(ax, ay, az, bx, by, bz); return; }
+
+      // Two perpendicular axes to the bolt direction
+      let px: number, py: number, pz: number;
+      if (Math.abs(dy / len) < 0.9) { px = dz / len; py = 0; pz = -dx / len; }
+      else { px = 0; py = -dz / len; pz = dy / len; }
+      const qx = dy * pz - dz * py, qy = dz * px - dx * pz, qz = dx * py - dy * px;
+      const ql = Math.sqrt(qx * qx + qy * qy + qz * qz) || 1;
+      const r1 = (Math.random() - 0.5) * 2 * jitter;
+      const r2 = (Math.random() - 0.5) * 2 * jitter;
+      const jx = mx + px * r1 + (qx / ql) * r2;
+      const jy = my + py * r1 + (qy / ql) * r2;
+      const jz = mz + pz * r1 + (qz / ql) * r2;
+      genJagged(out, ax, ay, az, jx, jy, jz, depth - 1, jitter * 0.65);
+      genJagged(out, jx, jy, jz, bx, by, bz, depth - 1, jitter * 0.65);
+    }
+
+    function spawnLightning(hx: number, hy: number, hz: number) {
+      const segs: number[] = [];
+
+      // Find nearest vertices
+      const closest: { i: number; d: number }[] = [];
+      for (let i = 0; i < N; i++) {
+        const i3 = i * 3;
+        const dx = basePositions[i3] - hx, dy = basePositions[i3 + 1] - hy, dz = basePositions[i3 + 2] - hz;
+        const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (d < MAGNET_RADIUS * 1.6) closest.push({ i, d });
+      }
+      closest.sort((a, b) => a.d - b.d);
+
+      for (const { i } of closest.slice(0, 4)) {
+        const i3 = i * 3;
+        const ex = basePositions[i3], ey = basePositions[i3 + 1], ez = basePositions[i3 + 2];
+
+        // Primary bolt: hit point → vertex
+        genJagged(segs, hx, hy, hz, ex, ey, ez, 3, 0.09);
+
+        // Branch along 1–2 edges from this vertex
+        const nbrs = (adjacency.get(i) ?? []).slice().sort(() => Math.random() - 0.5);
+        const branchCount = Math.random() < 0.5 ? 2 : 1;
+        for (let b = 0; b < branchCount && b < nbrs.length; b++) {
+          const ni = nbrs[b], n3 = ni * 3;
+          genJagged(segs, ex, ey, ez, basePositions[n3], basePositions[n3 + 1], basePositions[n3 + 2], 2, 0.055);
+          // Second-level branch
+          const nbrs2 = adjacency.get(ni) ?? [];
+          if (nbrs2.length > 0 && Math.random() < 0.45) {
+            const ni2 = nbrs2[Math.floor(Math.random() * nbrs2.length)], n23 = ni2 * 3;
+            genJagged(segs, basePositions[n3], basePositions[n3 + 1], basePositions[n3 + 2],
+              basePositions[n23], basePositions[n23 + 1], basePositions[n23 + 2], 1, 0.03);
           }
         }
       }
-      lineGeo.setDrawRange(0, ci * 2);
-      linePosBuf.needsUpdate = true;
-      lineColBuf.needsUpdate = true;
+
+      const count = Math.min(Math.floor(segs.length / 6), LIGHTNING_MAX_SEGS);
+      for (let k = 0; k < count * 6; k++) lightningPosArr[k] = segs[k];
+      lightningGeo.setDrawRange(0, count * 2);
+      lightningPosBuf.needsUpdate = true;
+
     }
-
-    updateConnections();
-
-    // ── RINGS — built as LineLoop for clean single-line circles ──
-    function makeRing(
-      radius: number,
-      segments: number,
-      opacity: number
-    ): THREE.LineLoop {
-      const pts: THREE.Vector3[] = [];
-      for (let i = 0; i <= segments; i++) {
-        const a = (i / segments) * Math.PI * 2;
-        pts.push(
-          new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0)
-        );
-      }
-      const rGeo = new THREE.BufferGeometry().setFromPoints(pts);
-      const rMat = new THREE.LineBasicMaterial({
-        color: 0xf5a623,
-        transparent: true,
-        opacity,
-      });
-      return new THREE.LineLoop(rGeo, rMat);
-    }
-
-    const ring1 = makeRing(RADIUS * 1.01, 120, 0.18);
-    ring1.rotation.x = Math.PI / 2;
-    scene.add(ring1);
-
-    const ring2 = makeRing(RADIUS * 1.01, 120, 0.09);
-    ring2.rotation.set(Math.PI * 0.35, 0, Math.PI * 0.15);
-    scene.add(ring2);
 
     // ── MOUSE ──
-    let targetRotX = 0,
-      targetRotY = 0;
-    let currentRotX = 0,
-      currentRotY = 0;
+    let targetRotX = 0, targetRotY = 0;
+    let currentRotX = 0, currentRotY = 0;
     let autoRotY = 0;
 
+    const mouse2D = new THREE.Vector2(-999, -999);
+    const raycaster = new THREE.Raycaster();
+    const invMatrix = new THREE.Matrix4();
+    const localOrigin = new THREE.Vector3();
+    const localDir = new THREE.Vector3();
+    const localRay = new THREE.Ray();
+    const hitPt = new THREE.Vector3();
+    const hitSphere = new THREE.Sphere(new THREE.Vector3(), RADIUS);
+
     const onMouseMove = (e: MouseEvent) => {
-      if (disableMouseControl) return;
-      targetRotX = (e.clientY / window.innerHeight - 0.5) * 0.5;
-      targetRotY = (e.clientX / window.innerWidth - 0.5) * 0.8;
+      const rect = canvas.getBoundingClientRect();
+      mouse2D.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse2D.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      if (!disableMouseControl) {
+        targetRotX = (e.clientY / window.innerHeight - 0.5) * 0.5;
+        targetRotY = (e.clientX / window.innerWidth - 0.5) * 0.8;
+      }
     };
     document.addEventListener("mousemove", onMouseMove);
 
-    // ── SCROLL → slide globe from left to center + zoom in ──
+    // ── SCROLL ──
     const bannerHeight = window.innerHeight - 64;
     let scrollProgress = 0;
     const onScroll = () => {
@@ -205,9 +290,9 @@ export default function GlobeCanvas({
       canvas.style.transform = `translateX(${(1 - scrollProgress) * position}%)`;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll(); // set initial position
+    onScroll();
 
-    // ── RESIZE via ResizeObserver ──
+    // ── RESIZE ──
     const ro = new ResizeObserver(() => {
       if (disableResize) return;
       W = canvas.clientWidth;
@@ -215,34 +300,102 @@ export default function GlobeCanvas({
       renderer.setSize(W, H, false);
       camera.aspect = W / H;
       camera.updateProjectionMatrix();
+      lineMat.resolution.set(W, H);
     });
     ro.observe(canvas);
 
     // ── ANIMATION LOOP ──
     let rafId: number;
+    let wasDisplaced = false;
+    let lightningOpacity = 0;
+    let lightningTick = 0;
 
-    function animate(_t: number) {
+    function animate() {
       rafId = requestAnimationFrame(animate);
 
-      autoRotY += disableAutoRotate ? 0 : 0.0028;
+      // Rotation
+      autoRotY += disableAutoRotate ? 0 : 0.0006;
       currentRotX += (targetRotX - currentRotX) * 0.04;
       currentRotY += (targetRotY - currentRotY) * 0.04;
+      globeGroup.position.x = xOffset;
+      globeGroup.position.y = yOffset;
+      globeGroup.rotation.y = autoRotY + currentRotY;
+      globeGroup.rotation.x = currentRotX;
 
-      points.rotation.y = autoRotY + currentRotY;
-      points.rotation.x = currentRotX;
-      lines.rotation.copy(points.rotation);
-
-      ring1.rotation.x = Math.PI / 2 + currentRotX * 0.3;
-      ring1.rotation.y = autoRotY * 0.4;
-      ring2.rotation.y = autoRotY * 0.25 + currentRotY;
-
-      // Zoom in as globe moves to center
+      // Camera zoom on scroll
       camera.position.z +=
-        (CAMERA_Z_START +
-          (CAMERA_Z_END - CAMERA_Z_START) * scrollProgress -
-          camera.position.z) *
-        0.05;
+        (cameraStartSize + (cameraEndSize - cameraStartSize) * scrollProgress - camera.position.z) * 0.14;
 
+      // ── MAGNETIC EFFECT ──
+      // Transform mouse ray into globeGroup local space
+      globeGroup.updateMatrixWorld();
+      invMatrix.copy(globeGroup.matrixWorld).invert();
+      raycaster.setFromCamera(mouse2D, camera);
+      localOrigin.copy(raycaster.ray.origin).applyMatrix4(invMatrix);
+      localDir.copy(raycaster.ray.direction).transformDirection(invMatrix);
+      localRay.set(localOrigin, localDir);
+
+      const hits = localRay.intersectSphere(hitSphere, hitPt);
+
+      if (hits) {
+        // Attract nearby vertices toward the hit point
+        for (let i = 0; i < N; i++) {
+          const i3 = i * 3;
+          const dx = basePositions[i3] - hitPt.x;
+          const dy = basePositions[i3 + 1] - hitPt.y;
+          const dz = basePositions[i3 + 2] - hitPt.z;
+          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          if (dist < MAGNET_RADIUS && dist > 0.0001) {
+            const t = 1 - dist / MAGNET_RADIUS;
+            const pull = (t * t * MAGNET_STRENGTH * RADIUS) / dist;
+            dispTargets[i3] = -dx * pull;
+            dispTargets[i3 + 1] = -dy * pull;
+            dispTargets[i3 + 2] = -dz * pull;
+          } else {
+            dispTargets[i3] = 0;
+            dispTargets[i3 + 1] = 0;
+            dispTargets[i3 + 2] = 0;
+          }
+        }
+      } else if (wasDisplaced) {
+        dispTargets.fill(0);
+      }
+
+      // Smooth displacement + write into position buffer
+      let anyDisp = false;
+      for (let i = 0; i < N; i++) {
+        const i3 = i * 3;
+        currentDisp[i3] += (dispTargets[i3] - currentDisp[i3]) * 0.10;
+        currentDisp[i3 + 1] += (dispTargets[i3 + 1] - currentDisp[i3 + 1]) * 0.10;
+        currentDisp[i3 + 2] += (dispTargets[i3 + 2] - currentDisp[i3 + 2]) * 0.10;
+        currentPositions[i3] = basePositions[i3] + currentDisp[i3];
+        currentPositions[i3 + 1] = basePositions[i3 + 1] + currentDisp[i3 + 1];
+        currentPositions[i3 + 2] = basePositions[i3 + 2] + currentDisp[i3 + 2];
+        if (
+          Math.abs(currentDisp[i3]) > 0.0005 ||
+          Math.abs(currentDisp[i3 + 1]) > 0.0005 ||
+          Math.abs(currentDisp[i3 + 2]) > 0.0005
+        ) anyDisp = true;
+      }
+
+      if (anyDisp || wasDisplaced) {
+        posBuf.needsUpdate = true;
+        updateLines();
+      }
+      wasDisplaced = anyDisp;
+
+      // ── LIGHTNING ──
+      if (hits) {
+        if (lightningTick % 3 === 0) spawnLightning(hitPt.x, hitPt.y, hitPt.z);
+        lightningTick++;
+        lightningOpacity = Math.min(1, lightningOpacity + 0.22);
+      } else {
+        lightningTick = 0;
+        lightningOpacity = Math.max(0, lightningOpacity - 0.10);
+      }
+      const flicker = hits ? 0.65 + Math.random() * 0.35 : 1.0;
+      lightningCoreMat.opacity = lightningOpacity * flicker * 0.95;
+      lightningGlowMat.opacity = lightningOpacity * flicker * 0.50;
       renderer.render(scene, camera);
     }
 
@@ -257,6 +410,8 @@ export default function GlobeCanvas({
     };
   }, [
     position,
+    xOffset,
+    yOffset,
     cameraStartSize,
     cameraEndSize,
     disableAutoRotate,

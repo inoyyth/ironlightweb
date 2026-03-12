@@ -14,8 +14,8 @@ export default function Topbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center bg-neutral-900">
-      <div className="container mx-auto flex max-w-7xl items-center justify-between bg-neutral-950 px-10 py-5 pt-11 lg:px-10 lg:py-8">
+    <header className="sticky top-0 z-50 flex h-16 lg:h-auto  shrink-0 items-center bg-neutral-900">
+      <div className="container mx-auto flex max-w-7xl items-center justify-between bg-neutral-950 px-10 py-5 pt-11 lg:px-10 lg:py-4">
         {/* Logo */}
         <span className="text-lg font-semibold text-gray-800">
           <Image src="/images/logo.png" alt="App Logo" width={145} height={40} />

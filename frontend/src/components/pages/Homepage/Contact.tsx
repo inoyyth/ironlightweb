@@ -1,10 +1,11 @@
 import Svg from "@/components/shared/Svg";
 import Image from "next/image";
+import GlobeCanvas from "@/components/shared/GlobeCanvas";
 
 export default function Contact() {
   return (
-    <div className="inline-flex w-full flex-col items-start justify-start gap-20 self-stretch bg-neutral-25 p-0 lg:p-20">
-      <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="relative inline-flex w-full flex-col items-start justify-start gap-20 self-stretch bg-neutral-25 p-0 lg:p-20">
+      <div className="relative container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 w-full lg:flex-row items-end justify-between self-stretch">
           <div className="inline-flex flex-col items-start justify-start gap-4">
             <Image

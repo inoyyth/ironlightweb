@@ -1,10 +1,22 @@
 import Svg from "@/components/shared/Svg";
+import GlobeCanvas from "@/components/shared/GlobeCanvas";
 
 export default function Conversation() {
   return (
-    <div className="relative w-full bg-transparent py-[188px]">
+    <div className="relative w-full bg-transparent lg:pb-[188px] pb-10 pt-10 overflow-hidden">
+      <div className="hidden lg:block relative z-0 top-0 left-0 w-full h-[280px] overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-[560px] -translate-y-1/2">
+            <GlobeCanvas
+              cameraStartSize={4}
+              cameraEndSize={4}
+              position={0}
+              disableScrollEffect
+              disableMouseControl
+            />
+          </div>
+        </div>
       <div className="container relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center justify-start gap-2 self-stretch">
+        <div className="relative z-flex flex-col items-center justify-start gap-2 self-stretch">
           <div className="justify-start self-stretch text-center text-2xl lg:text-3xl font-bold leading-10 text-neutral-25">
             Start a conversation
           </div>
@@ -35,11 +47,6 @@ export default function Conversation() {
             </div>
           </div>
         </div>
-        {/* <div className="absolute inset-0 z-0 overflow-hidden">
-          <div className="absolute inset-0 translate-x-[0%] translate-y-[0%] p-4">
-            <GlobeCanvas cameraStartSize={3} cameraEndSize={3} position={0} />
-          </div>
-        </div> */}
       </div>
     </div>
   );

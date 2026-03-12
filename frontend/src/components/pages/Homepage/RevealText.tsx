@@ -34,7 +34,7 @@ export default function HomepageScrollRevealText() {
       ref={sectionRef}
       className="container relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"
     >
-      <div className="relative z-10 pb-0 pt-20 lg:pb-20">
+      <div className="relative z-10 pb-0 pt-20 lg:pt-[118px] lg:pb-20">
         <ScrollRevealText
           content={SEGMENTS}
           pointStartChange={isMobile ? 250 : 150}
@@ -42,13 +42,13 @@ export default function HomepageScrollRevealText() {
           className="text-center text-2xl lg:text-5xl font-bold leading-9 lg:first-letter:leading-[64px]"
         />
       </div>
-      {visible && (
-        <div className="hidden lg:block absolute inset-0 z-0 overflow-hidden">
+
+        <div className="hidden lg:block absolute inset-0 z-0 top-10 overflow-hidden">
           <div className="absolute inset-0 p-4">
-            <GlobeCanvas cameraStartSize={3} cameraEndSize={3} position={0} />
+            <GlobeCanvas cameraStartSize={2000} cameraEndSize={3} position={0} />
           </div>
         </div>
-      )}
+      
     </div>
   );
 }

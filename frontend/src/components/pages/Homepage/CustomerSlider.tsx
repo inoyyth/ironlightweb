@@ -1,6 +1,5 @@
 "use client";
 
-import Svg from "@/components/shared/Svg";
 import { ReactNode, useRef } from "react";
 
 const clients: { name: string; icon: ReactNode }[] = [

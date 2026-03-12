@@ -40,7 +40,7 @@ export default function Experience() {
               No chaos. No theatre.
             </div>
           </div>
-          <div className="hidden lg:absolute inset-0 z-0 overflow-hidden">
+          <div className="hidden lg:block lg:absolute inset-0 z-0 overflow-hidden">
             <div className="absolute inset-0 translate-x-[26%] translate-y-[36%] p-4">
               <GlobeCanvas cameraStartSize={3} cameraEndSize={3} position={0} />
             </div>

@@ -95,7 +95,9 @@ export default function Topbar() {
               <div key={item.label} className="border-b border-neutral-700">
                 <div className="flex items-center gap-3 py-6">
                   {item.active && (
-                    <span className="text-secondary-600 font-semibold text-base">→</span>
+                    <span className="text-secondary-600 font-semibold text-base">
+                      <Svg use="arrow" className="h-6 w-6 text-secondary-600" />
+                    </span>
                   )}
                   <span className={`text-base font-semibold ${item.active ? "text-secondary-600" : "text-neutral-25"}`}>
                     {item.label}

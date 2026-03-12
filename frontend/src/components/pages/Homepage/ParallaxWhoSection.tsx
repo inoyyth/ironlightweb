@@ -29,8 +29,8 @@ export default function ParallaxWhoSection() {
             </p>
             <ScrollRevealText
               content={SEGMENTS}
-              pointStartChange={isMobile ? 300 : 150}
-              endPointChange={isMobile ? 350 :250}
+              pointStartChange={isMobile ? 450 : 150}
+              endPointChange={isMobile ? 100 :250}
               className="text-neutral-25 first-line:text-center text-2xl lg:text-3xl font-bold leading-9 lg:first-letter:leading-[64px]"
             />
           </div>

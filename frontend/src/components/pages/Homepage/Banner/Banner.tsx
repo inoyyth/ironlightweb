@@ -15,8 +15,8 @@ export default function Banner() {
         </div>
         {/* Scroll hint */}
         <div className="animate-fade-in left-0 lg:left-auto absolute bottom-[54px] z-[2] max-w-full lg:max-w-[630px] px-4 lg:px-[52px] pt-6 text-base lg:text-lg text-neutral-25 opacity-0">
-          Web systems, commerce platforms, and enterprise integrations 
-          <p className="w-fit inline-block"> 
+          <p>Web systems, commerce platforms, and enterprise integrations</p>
+          <p className="block"> 
             — <span className="underline decoration-secondary-500 decoration-2 underline-offset-1">built right and kept stable.</span>
           </p>
           <div className="flex flex-col lg:flex-row gap-4 pt-6">

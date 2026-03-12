@@ -34,8 +34,8 @@ export default function Experience() {
             </h2>
             <ScrollRevealText
               content={SEGMENTS}
-              pointStartChange={isMobile ? 300 : 150}
-              endPointChange={isMobile ? 350 :250}
+              pointStartChange={isMobile ? 450 : 150}
+              endPointChange={isMobile ? 100 :250}
               className="text-left text-2xl lg:text-5xl font-bold leading-8 lg:leading-[64px]"
             />
             <div className="text-neutral-25 lg:text-neutral-900 mt-16 w-fit cursor-pointer bg-neutral-960 lg:bg-secondary-600 p-4 text-2xl lg:text-4xl font-bold opacity-100 lg:opacity-50 lg:transition-opacity lg:hover:opacity-100">

@@ -1,14 +1,14 @@
 "use client";
 
-import { customersSlider } from "@/constants/homepage";
-import { ReactNode, useRef } from "react";
+import { CustomerSliderProps, customersSlider } from "@/constants/homepage";
+import { useRef } from "react";
 
 function SliderItem({
   name,
   onMouseEnter,
   onMouseLeave,
 }: {
-  name: { name: string; icon: ReactNode };
+  name: CustomerSliderProps;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 }) {
@@ -18,8 +18,13 @@ function SliderItem({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <span className="px-6 lg:px-10 text-sm font-semibold tracking-wide text-neutral-500 transition-colors duration-200 hover:text-neutral-25">
-        {name.icon}
+      <span className="group px-2 text-sm font-semibold tracking-wide text-neutral-500 transition-colors duration-200 hover:text-neutral-25 lg:px-10">
+        <span className="block origin-center scale-[0.8] group-hover:hidden lg:scale-100">
+          {name.default}
+        </span>
+        <span className="hidden origin-center scale-[0.8] group-hover:block lg:scale-100">
+          {name.active}
+        </span>
       </span>
     </div>
   );
@@ -46,8 +51,8 @@ export default function CustomerSlider() {
 
   return (
     <div className="w-full overflow-hidden bg-transparent py-20 lg:py-[128px]">
-      <div ref={containerRef} className="animate-marquee flex w-max">
-        {items.map((name, i) => (
+      <div ref={containerRef} className="flex w-max animate-marquee">
+        {items.map((name: CustomerSliderProps, i) => (
           <SliderItem
             key={i}
             name={name}

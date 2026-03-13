@@ -3,14 +3,29 @@
 import { CustomerSliderProps, customersSlider } from "@/constants/homepage";
 import { useRef } from "react";
 
+export type SliderProps = {
+  mobileScale?: number;
+  desktopScale?: number;
+  mobileGap?: number
+  desktopGap?: number
+};
+
 function SliderItem({
   name,
   onMouseEnter,
   onMouseLeave,
+  mobileScale,
+  desktopScale,
+  mobileGap,
+  desktopGap
 }: {
   name: CustomerSliderProps;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  mobileScale: number;
+  desktopScale: number;
+  mobileGap: number;
+  desktopGap: number;
 }) {
   return (
     <div
@@ -18,11 +33,11 @@ function SliderItem({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <span className="group px-2 text-sm font-semibold tracking-wide text-neutral-500 transition-colors duration-200 hover:text-neutral-25 lg:px-10">
-        <span className="block origin-center scale-[0.8] group-hover:hidden lg:scale-100">
+      <span className={`group px-${mobileGap} text-sm font-semibold tracking-wide text-neutral-500 transition-colors duration-200 hover:text-neutral-25 lg:px-${desktopGap}`}>
+        <span className={`block origin-center scale-[${mobileScale}] group-hover:hidden lg:scale-[${desktopScale}]`}>
           {name.default}
         </span>
-        <span className="hidden origin-center scale-[0.8] group-hover:block lg:scale-100">
+        <span className={`hidden origin-center scale-[${mobileScale}] group-hover:block lg:scale-[${desktopScale}]`}>
           {name.active}
         </span>
       </span>
@@ -30,7 +45,7 @@ function SliderItem({
   );
 }
 
-export default function CustomerSlider() {
+export default function CustomerSlider({ mobileScale = 0.8, desktopScale = 1, mobileGap = 2, desktopGap = 10 }: SliderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Triplicate to ensure seamless loop at any screen width
@@ -50,7 +65,7 @@ export default function CustomerSlider() {
   };
 
   return (
-    <div className="w-full overflow-hidden bg-transparent py-20 lg:py-[128px]">
+    <div className="w-full overflow-hidden bg-transparent">
       <div ref={containerRef} className="flex w-max animate-marquee">
         {items.map((name: CustomerSliderProps, i) => (
           <SliderItem
@@ -58,6 +73,10 @@ export default function CustomerSlider() {
             name={name}
             onMouseEnter={() => changeSpeed(90)}
             onMouseLeave={() => changeSpeed(30)}
+            mobileScale={mobileScale}
+            desktopScale={desktopScale}
+            mobileGap={mobileGap}
+            desktopGap={desktopGap}
           />
         ))}
       </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Svg from "../shared/Svg";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { NAV_ITEMS } from "@/constants/navigation";
+import { NAV_ITEMS, ButtonNavigation } from "@/constants/navigation";
 
 export default function Topbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,9 +37,16 @@ export default function Topbar() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center lg:flex">
-          <a href="/work" className={clsx("px-9 py-3 text-base text-neutral-25 hover:text-secondary-600", { "text-secondary-600": path === "/work" })}>Work</a>
-          <a href="/services" className={clsx("px-9 py-3 text-base text-neutral-25 hover:text-secondary-600", { "text-secondary-600": path === "/services" })}>Services</a>
-          <a href="/about" className={clsx("px-9 py-3 text-base text-neutral-25 hover:text-secondary-600", { "text-secondary-600": path === "/about" })}>About</a>
+          {/* Map through nav items and apply active class based on current path */}
+          {navItems.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className={clsx("px-9 py-3 text-base text-neutral-25 hover:border-b border-secondary-600", { "border-b border-secondary-600": path === item.href })}
+            >
+              {item.label}
+            </a>
+          ))}
         </nav>
 
         {/* Desktop actions */}
@@ -58,7 +65,7 @@ export default function Topbar() {
                 <Svg use="arrow" className="h-6 w-6 text-neutral-25 group-hover:text-neutral-900" />
               </div>
               <div className="font-inter cursor-pointer justify-start text-sm font-semibold leading-5 text-neutral-25 group-hover:bg-neutral-25 group-hover:text-neutral-900">
-                Let&apos;s Work Together
+                {ButtonNavigation.buttonWork}
               </div>
             </div>
           </div>

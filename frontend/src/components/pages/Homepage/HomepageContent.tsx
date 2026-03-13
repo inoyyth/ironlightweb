@@ -9,7 +9,9 @@ export default function HomepageContent() {
   return (
     <div className="w-full bg-neutral-900">
       <HomepageScrollRevealText />
-      <CustomerSlider />
+      <div className="py-20 lg:py-[128px]">
+        <CustomerSlider />
+      </div>
       <Experience />
       <ParallaxWhoSection />
       <Conversation />

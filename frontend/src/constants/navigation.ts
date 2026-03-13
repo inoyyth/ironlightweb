@@ -3,3 +3,7 @@ export const NAV_ITEMS = [
   { label: "Services", href: "/services" },
   { label: "About", href: "/about" },
 ];
+
+export const ButtonNavigation = {
+  buttonWork: "Let's Work Together"
+}

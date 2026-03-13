@@ -19,6 +19,29 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        manrope: ["var(--font-manrope)", "sans-serif"],
+        inter: ["var(--font-inter)", "sans-serif"],
+      },
+      keyframes: {
+        up: { to: { opacity: "1", transform: "none" } },
+        fadeIn: { to: { opacity: "1" } },
+        scan: {
+          "0%": { left: "-100%" },
+          "50%": { left: "100%" },
+          "100%": { left: "100%" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-33.333%)" },
+        },
+      },
+      animation: {
+        up: "up 0.75s ease 0.55s forwards",
+        "fade-in": "fadeIn 0.75s ease 1.5s forwards",
+        scan: "scan 2s ease-in-out 1.6s infinite",
+        marquee: "marquee 30s linear infinite",
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
@@ -34,6 +57,8 @@ const config: Config = {
           700: "#4c4c4c",
           800: "#333333",
           900: "#000000",
+          950: "#161616",
+          960: "#202020"
         },
         primary: {
           25: "#fdfeff",

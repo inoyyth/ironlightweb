@@ -1,6 +1,5 @@
 import Topbar from "./Topbar";
 import MainContent from "./MainContent";
-import Footer from "./Footer";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -8,10 +7,9 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex min-h-screen flex-col">
       <Topbar />
       <MainContent>{children}</MainContent>
-      <Footer />
     </div>
   );
 }

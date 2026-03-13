@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     template: 'Ironlight - %s',
     default: 'Ironlight - Homepage',
   },
-  description: 'Ironlight',
+  description: 'From WooCommerce migrations to custom Laravel platforms and AI-powered workflows — Ironlight delivers software that scales. Estonian quality, global reach.',
 }
 export default function RootLayout({
   children,

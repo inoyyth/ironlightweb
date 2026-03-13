@@ -18,6 +18,8 @@ type GlobeCanvasProps = {
   disableScrollEffect?: boolean;
   disableResize?: boolean;
   disableLightning?: boolean;
+  cameraTransitionSpeed?: number;
+  elementScroll?: boolean;
 };
 
 export default function GlobeCanvas({
@@ -31,6 +33,8 @@ export default function GlobeCanvas({
   disableScrollEffect = false,
   disableResize = false,
   disableLightning = false,
+  cameraTransitionSpeed = 0.14,
+  elementScroll = false,
 }: GlobeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -290,8 +294,14 @@ export default function GlobeCanvas({
     let scrollProgress = 0;
     const onScroll = () => {
       if (disableScrollEffect) return;
-      scrollProgress = Math.min(1, window.scrollY / bannerHeight);
-      canvas.style.transform = `translateX(${(1 - scrollProgress) * position}%)`;
+      if (elementScroll) {
+        const rect = canvas.getBoundingClientRect();
+        // progress: 0 when element enters bottom of viewport, 1 when element top reaches center
+        scrollProgress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight / 2)));
+      } else {
+        scrollProgress = Math.min(1, window.scrollY / bannerHeight);
+        canvas.style.transform = `translateX(${(1 - scrollProgress) * position}%)`;
+      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -328,7 +338,7 @@ export default function GlobeCanvas({
 
       // Camera zoom on scroll
       camera.position.z +=
-        (cameraStartSize + (cameraEndSize - cameraStartSize) * scrollProgress - camera.position.z) * 0.14;
+        (cameraStartSize + (cameraEndSize - cameraStartSize) * scrollProgress - camera.position.z) * cameraTransitionSpeed;
 
       // ── MAGNETIC EFFECT ──
       // Transform mouse ray into globeGroup local space
@@ -425,6 +435,8 @@ export default function GlobeCanvas({
     disableScrollEffect,
     disableResize,
     disableLightning,
+    cameraTransitionSpeed,
+    elementScroll,
   ]);
 
   return (

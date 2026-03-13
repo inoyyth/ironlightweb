@@ -1,5 +1,6 @@
 import Svg from "@/components/shared/Svg";
 import GlobeCanvas from "@/components/shared/GlobeCanvas";
+import { CONVERSATION } from "@/constants/homepage";
 
 export default function Conversation() {
   return (
@@ -19,15 +20,15 @@ export default function Conversation() {
       <div className="container relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="relative flex flex-col items-center justify-start gap-2 self-stretch">
           <div className="justify-start self-stretch text-center text-2xl lg:text-3xl font-bold leading-10 text-neutral-25">
-            Start a conversation
+            {CONVERSATION.heading}
           </div>
           <div className="justify-start self-stretch text-center text-base font-normal leading-6 text-neutral-25">
-            No forms. No sales calls. Just a direct message to Henri.
+            {CONVERSATION.subheading}
           </div>
           <div className="flex mt-6 flex-col lg:flex-row w-full items-center justify-center gap-10">
             <div className="group flex cursor-pointer items-center justify-center gap-2.5 border-b px-6 py-5 hover:border-b-2 hover:border-secondary-500">
               <div className="flex items-center justify-start gap-3 text-center text-[20px] lg:text-3xl font-bold leading-10 text-neutral-25">
-                <span>hello@ironlight.ee</span>
+                <span>{CONVERSATION.email}</span>
                 <Svg
                   use="arrow"
                   className="h-8 w-8 hidden transition-opacity group-hover:block"
@@ -35,11 +36,11 @@ export default function Conversation() {
               </div>
             </div>
             <div className="justify-start text-center text-base font-normal leading-6 text-neutral-25">
-              OR
+              {CONVERSATION.divider}
             </div>
             <div className="group flex cursor-pointer items-center justify-center gap-2.5 border-b px-6 py-5 hover:border-b-2 hover:border-secondary-500">
               <div className="flex items-center justify-start gap-3 text-center text-[20px] lg:text-3xl font-bold leading-10 text-neutral-25">
-                <span>book a 30-min call</span>
+                <span>{CONVERSATION.bookCall}</span>
                 <Svg
                   use="arrow"
                   className="h-8 w-8 hidden transition-opacity group-hover:block"

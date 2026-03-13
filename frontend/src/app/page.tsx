@@ -32,6 +32,7 @@ export default function Home() {
             position={0}
             xOffset={0.9}
             yOffset={isMobile ? 0.5 : 0}
+            cameraTransitionSpeed={0.4}
           />
         </div>
         <Banner />

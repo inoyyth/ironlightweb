@@ -1,5 +1,6 @@
 import Svg from "@/components/shared/Svg";
 import Image from "next/image";
+import { CONTACT } from "@/constants/homepage";
 
 export default function Contact() {
   return (
@@ -14,19 +15,18 @@ export default function Contact() {
               height={52}
             />
             <div className="justify-start text-base font-semibold leading-6 text-neutral-900">
-              We build and stabilise the systems businesses run on.
+              {CONTACT.tagline}
             </div>
             <div className="inline-flex items-start justify-start gap-1">
               <div className="flex justify-start gap-1 text-base font-normal leading-6 text-neutral-900">
                 <Svg use="email" className="h-6 w-6" />
-                hello@ironlight.ee
+                {CONTACT.email}
               </div>
             </div>
           </div>
           <div className="inline-flex flex-col items-start justify-start gap-6">
             <div className="w-full lg:w-[519px] justify-start text-base font-normal leading-6 text-neutral-900">
-              A senior-led team. Clearly scoped engagements. Practical decisions
-              over meetings. We build systems that stay built.
+              {CONTACT.description}
             </div>
             <div className="inline-flex items-start justify-start gap-8">
               <Svg use="linkedin" className="h-6 w-6" />

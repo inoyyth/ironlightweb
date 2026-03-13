@@ -4,12 +4,7 @@ import { useRef } from "react";
 import ScrollRevealText from "@/components/shared/ScrollRevealText";
 import GlobeCanvas from "@/components/shared/GlobeCanvas";
 import { useIsMobile } from "@/hooks/useIsMobile";
-
-const SEGMENTS = [
-  "We design and build systems that didn't exist. ",
-  "We rebuild systems that matter. ",
-  "We integrate things that were never meant to fit. We take over live systems and make them stable",
-];
+import { REVEAL_TEXT_SEGMENTS } from "@/constants/homepage";
 
 export default function HomepageScrollRevealText() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -22,16 +17,16 @@ export default function HomepageScrollRevealText() {
     >
       <div className="relative z-10 pb-0 pt-20 lg:pt-[118px] lg:pb-20">
         <ScrollRevealText
-          content={SEGMENTS}
+          content={REVEAL_TEXT_SEGMENTS}
           pointStartChange={isMobile ? 450 : 150}
           endPointChange={isMobile ? 100 : 250}
-          className="text-center text-2xl lg:text-5xl font-bold leading-9 lg:first-letter:leading-[64px]"
+          className="text-center text-2xl lg:text-5xl font-bold leading-9 lg:leading-[64px]"
         />
       </div>
 
         <div className="hidden lg:block absolute inset-0 z-0 top-10 overflow-hidden">
           <div className="absolute inset-0 p-4">
-            <GlobeCanvas disableLightning cameraStartSize={2000} cameraEndSize={3} position={0} />
+            <GlobeCanvas disableLightning cameraStartSize={2000} cameraEndSize={3} position={0} cameraTransitionSpeed={0.4} elementScroll />
           </div>
         </div>
       

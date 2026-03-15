@@ -1,8 +1,11 @@
 'use client'
 
 import Banner from "@/components/pages/Work/Banner";
-import WorkContent from "@/components/pages/Work/WorkContent";
+import Contact from "@/components/pages/Work/Contact";
+import Conversation from "@/components/pages/Work/Conversation";
+import WorkContent from "@/components/pages/Work/Workcontent";
 import GlobeCanvas from "@/components/shared/GlobeCanvas";
+import { useTopbar } from "@/context/TopbarContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useEffect, useState } from "react";
 
@@ -11,9 +14,12 @@ export default function WorkPage() {
    // Default to mobile (true) until detected — prevents big desktop globe flash on mobile
    const isMobile = isMobileDetected ?? true;
    const [globeVisible, setGlobeVisible] = useState(false);
+
+   const { setActive} = useTopbar();
  
    useEffect(() => {
      const t = setTimeout(() => setGlobeVisible(true), 500);
+     setActive("/work/");
      return () => clearTimeout(t);
    }, []);
  
@@ -38,9 +44,12 @@ export default function WorkPage() {
          </div>
          <Banner />
        </div>
- 
-       {/* Globe naturally unsticks from here */}
-       <WorkContent />
+      <div className="w-full">
+      {/* Globe naturally unsticks from here */}
+        <WorkContent />
+        <Conversation />
+        <Contact />
+      </div>
      </>
    );
 }

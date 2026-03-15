@@ -2,16 +2,18 @@
 
 import { useState } from "react";
 import Svg from "../shared/Svg";
-import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { NAV_ITEMS, ButtonNavigation } from "@/constants/navigation";
+import { useTopbar } from "@/context/TopbarContext";
 
 export default function Topbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  // get current url path to determine active nav item
-  const path = usePathname();
+  const { state } = useTopbar();
 
-  const navItems = NAV_ITEMS.map((item) => ({ ...item, active: path === item.href }));
+  // context activeHref takes priority over the URL path
+  const activeHref = state.activeHref;
+
+  const navItems = NAV_ITEMS.map((item) => ({ ...item, active: activeHref === item.href }));
 
   return (
     <header className="sticky top-0 z-50 flex h-16 lg:h-auto  shrink-0 items-center bg-neutral-900">
@@ -42,7 +44,7 @@ export default function Topbar() {
             <a
               key={item.label}
               href={item.href}
-              className={clsx("px-9 py-3 text-base text-neutral-25 hover:border-b border-secondary-600", { "border-b border-secondary-600": path === item.href })}
+              className={clsx("px-9 py-3 text-base text-neutral-25 hover:border-b border-secondary-600", { "border-b border-secondary-600": item.active })}
             >
               {item.label}
             </a>

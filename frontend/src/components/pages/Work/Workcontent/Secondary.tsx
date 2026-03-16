@@ -6,7 +6,7 @@ function WorkCard({ item }: { item: WorkItem }) {
     <section className="min-h-[calc(100vh-64px)] bg-neutral-900 border-neutral-0 py-6">
       <div className="self-stretch flex flex-col justify-start items-start gap-32 overflow-hidden">
         <div className="self-stretch flex flex-col justify-start items-start gap-6">
-          <div className="self-stretch h-[335px] lg:h-[656px] bg-zinc-300" />
+          <div className="self-stretch h-[335px] lg:h-[624 px] bg-zinc-300" />
           <div className="self-stretch flex flex-col justify-start items-start gap-3">
             <div className="inline-flex justify-start items-start gap-3">
               {item.tags.map((tag) => (

@@ -44,7 +44,7 @@ export default function WorkPage() {
          </div>
          <Banner />
        </div>
-      <div className="w-full">
+      <div className="w-full bg-neutral-900">
       {/* Globe naturally unsticks from here */}
         <WorkContent />
         <Conversation />

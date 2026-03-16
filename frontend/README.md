@@ -1,6 +1,20 @@
 # Frontend — Ironlight Web
 
-Frontend application for the Ironlight Web project, built with Next.js 14 (App Router), TypeScript, and Tailwind CSS.
+Frontend application for [Ironlight](https://ironlight.ee) — a senior-led web development agency based in Estonia that builds and stabilises web systems, commerce platforms, and enterprise integrations for businesses.
+
+Built with Next.js 14 (App Router), TypeScript, and Tailwind CSS.
+
+---
+
+## About the Project
+
+Ironlight's website presents the agency's services, past work, and contact information. The site is designed for founders and technical leads looking for a reliable engineering partner.
+
+**Pages:**
+- **Homepage** (`/`) — Banner, reveal text animation, customer slider, "who this is for" section, experience highlights, and contact CTA
+- **Work** (`/work`) — Showcase of client projects with tags, stack, what was done, and results
+
+**Planned pages:** Services (`/services`), About (`/about`)
 
 ---
 
@@ -11,6 +25,7 @@ Frontend application for the Ironlight Web project, built with Next.js 14 (App R
 | Next.js | 14 | React framework (App Router) |
 | TypeScript | 5 | Type safety |
 | Tailwind CSS | 3 | Utility-first styling |
+| Three.js | 0.183 | 3D globe canvas (shared component) |
 | Prettier | 3 | Code formatting |
 | prettier-plugin-tailwindcss | latest | Auto-sort Tailwind classes |
 
@@ -32,15 +47,52 @@ frontend/
 │   │   ├── fonts/             # Local fonts (Geist Sans, Geist Mono)
 │   │   ├── globals.css        # Global styles & CSS variables
 │   │   ├── layout.tsx         # Root layout (html, body, fonts)
-│   │   └── page.tsx           # Home page
+│   │   ├── page.tsx           # Home page
+│   │   └── work/
+│   │       └── page.tsx       # Work page
 │   │
-│   └── components/
-│       └── layout/            # Base layout components
-│           ├── AppLayout.tsx  # Composes Topbar + MainContent + Footer
-│           ├── Topbar.tsx     # Top navigation bar
-│           ├── MainContent.tsx# Dynamic page content wrapper
-│           ├── Footer.tsx     # Footer bar
-│           └── index.ts       # Barrel exports
+│   ├── components/
+│   │   ├── layout/            # Base layout components
+│   │   │   ├── AppLayout.tsx  # Composes Topbar + MainContent + Footer
+│   │   │   ├── Topbar.tsx     # Top navigation bar
+│   │   │   ├── MainContent.tsx# Dynamic page content wrapper
+│   │   │   ├── Footer.tsx     # Footer bar
+│   │   │   └── index.ts       # Barrel exports
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Homepage/      # Homepage section components
+│   │   │   │   ├── Banner/    # Hero banner with CTA
+│   │   │   │   ├── CustomerSlider.tsx
+│   │   │   │   ├── RevealText.tsx
+│   │   │   │   ├── ParallaxWhoSection.tsx
+│   │   │   │   ├── Experience.tsx
+│   │   │   │   ├── Conversation.tsx
+│   │   │   │   ├── Contact.tsx
+│   │   │   │   └── HomepageContent.tsx
+│   │   │   │
+│   │   │   └── Work/          # Work page section components
+│   │   │       ├── Banner.tsx
+│   │   │       ├── Conversation.tsx
+│   │   │       ├── Contact.tsx
+│   │   │       └── Workcontent/
+│   │   │           ├── Main.tsx
+│   │   │           └── Secondary.tsx
+│   │   │
+│   │   └── shared/            # Reusable components
+│   │       ├── GlobeCanvas.tsx# Three.js 3D globe
+│   │       ├── ScrollRevealText.tsx
+│   │       └── Svg.tsx
+│   │
+│   ├── constants/             # Static content and copy
+│   │   ├── homepage.tsx       # Homepage text, CTAs, customer logos
+│   │   ├── work.tsx           # Work items data
+│   │   └── navigation.ts      # Nav links
+│   │
+│   ├── context/
+│   │   └── TopbarContext.tsx  # Topbar scroll/visibility state
+│   │
+│   └── hooks/
+│       └── useIsMobile.ts     # Responsive breakpoint hook
 │
 ├── tailwind.config.ts         # Tailwind configuration & design tokens
 ├── .prettierrc                # Prettier configuration
@@ -50,8 +102,6 @@ frontend/
 ---
 
 ## Layout Architecture
-
-The base layout follows a single-responsibility principle — each component handles one concern:
 
 ```
 <RootLayout>               ← html, body, fonts  (app/layout.tsx)

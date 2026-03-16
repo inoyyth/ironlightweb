@@ -8,6 +8,14 @@ export type WorkItem = {
   stack: string[];
 };
 
+export const CONVERSATION = {
+  heading: "Working on something similar?",
+  subheading: "No forms. No sales calls. Just a direct message to Henri.",
+  email: "hello@ironlight.ee",
+  bookCall: "book a 30-min call",
+  divider: "OR",
+};
+
 export const WORK_ITEMS: WorkItem[] = [
   {
     tags: ["E-commerce", "Estonia"],

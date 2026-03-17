@@ -15,7 +15,7 @@ export default function ParallaxWhoSection() {
             <p className="text-secondary-600 mb-4 lg:mb-8 text-base lg:text-2xl font-semibold uppercase tracking-widest">
               {WHO_SECTION.forHeading}
             </p>
-            <p className="text-neutral-25 first-line:text-center text-2xl lg:text-3xl font-bold leading-7 lg:leading-[44px]">
+            <p className="text-neutral-25 text-2xl lg:text-3xl font-bold leading-7 lg:leading-[44px]">
               {WHO_SECTION.forBody}
             </p>
           </div>

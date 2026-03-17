@@ -302,8 +302,8 @@ export const customersSlider: CustomerSliderProps[] = [
     name: "anthropic",
     default: (
       <svg
-        width="570"
-        height="64"
+        width="285"
+        height="32"
         viewBox="0 0 570 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -359,8 +359,8 @@ export const customersSlider: CustomerSliderProps[] = [
     ),
     active: (
       <svg
-        width="570"
-        height="64"
+        width="285"
+        height="32"
         viewBox="0 0 570 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -715,8 +715,8 @@ export const customersSlider: CustomerSliderProps[] = [
     default: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="247"
-        height="64"
+        width="124"
+        height="32"
         viewBox="0 0 247 64"
         fill="none"
       >
@@ -752,8 +752,8 @@ export const customersSlider: CustomerSliderProps[] = [
     ),
     active: (
       <svg
-        width="247"
-        height="64"
+        width="124"
+        height="32"
         viewBox="0 0 247 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -790,8 +790,8 @@ export const customersSlider: CustomerSliderProps[] = [
     name: "nextjs",
     default: (
       <svg
-        width="315"
-        height="64"
+        width="158"
+        height="32"
         viewBox="0 0 315 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -845,8 +845,8 @@ export const customersSlider: CustomerSliderProps[] = [
     ),
     active: (
       <svg
-        width="315"
-        height="64"
+        width="158"
+        height="32"
         viewBox="0 0 315 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

@@ -10,7 +10,7 @@ export default function HomepageContent() {
     <div className="w-full bg-neutral-900">
       <HomepageScrollRevealText />
       <div className="py-20 lg:py-[128px]">
-        <CustomerSlider mobileGap={6}/>
+        <CustomerSlider mobileGap={6} mobileScale={0.002}/>
       </div>
       <Experience />
       <ParallaxWhoSection />

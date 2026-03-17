@@ -16,7 +16,7 @@ export default function Banner() {
             Proven outcomes.
           </p>
           <div className="animate-up animation-delay-200 opacity-0 [transform:translateY(22px)] py-6">
-            <CustomerSlider desktopScale={1} mobileScale={0.2} mobileGap={6} desktopGap={10} />
+            <CustomerSlider desktopScale={1} mobileGap={6} mobileScale={0.002} desktopGap={10} />
           </div>
         </div>
       </div>

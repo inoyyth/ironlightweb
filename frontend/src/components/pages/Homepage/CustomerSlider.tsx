@@ -45,7 +45,7 @@ function SliderItem({
   );
 }
 
-export default function CustomerSlider({ mobileScale = 0.8, desktopScale = 1, mobileGap = 2, desktopGap = 10 }: SliderProps) {
+export default function CustomerSlider({ mobileScale = 0.45, desktopScale = 1, mobileGap = 2, desktopGap = 10 }: SliderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Triplicate to ensure seamless loop at any screen width
